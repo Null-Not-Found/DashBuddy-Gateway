@@ -1,8 +1,8 @@
 #Custom ignores
 build
 
-
-
+#VSCode stuff
+.vs
 
 
 
