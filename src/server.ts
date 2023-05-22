@@ -11,28 +11,38 @@ app.use(bp.urlencoded({ extended: true }));
 async function getMicroservice(microserviceName: string): Promise<string> {
 	const DNS = "http://127.0.0.1:3001/get/"
 	let dnsCall = DNS.concat(microserviceName)
-	console.log(dnsCall)
-	fetch(dnsCall).then(response => response.json()).then(data => {
+	let result = fetch(dnsCall).then(response => response.json()).then(data => {
 		return data.data
 	  }).catch(error => {
 		return "Network Failure"
 	})
-	return ""
+	return result
 }
 
 app.get('/a', (req: Request, res: Response) => {
 	res.status(200).json({
 		"Time": new Date().toUTCString(),
-		"response": "b",
+		"response": "b"
 	});
 })
 
 app.get('/state', async (req: Request, res: Response) => {
 	let microserviceIP = await getMicroservice("state")
-	//fetch(microserviceIP).then().then().catch()
-	res.status(200).json({
+	console.log("get microserviceIP: " + microserviceIP)
+	await fetch(microserviceIP + "/ping").then(response => response.json()).then(data => {
+		res.status(200).json({
+			"Time": new Date().toUTCString(),
+			"response": data
+		});
+	}).catch(error => {
+		res.status(502).json({
+			"Time": new Date().toUTCString(),
+			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
+		});
+	})
+	res.status(502).json({
 		"Time": new Date().toUTCString(),
-		"response": "b",
+		"response": "https://tenor.com/view/shits-fucked-gif-25512725"
 	});
 })
 
