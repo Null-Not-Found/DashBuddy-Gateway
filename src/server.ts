@@ -1,5 +1,6 @@
 // Importing module
 import express, { Application, Request, Response } from 'express';
+import 'dotenv/config'
 
 const bp = require('body-parser');
 const app: Application = express();
@@ -26,13 +27,13 @@ app.get('/a', (req: Request, res: Response) => {
 	});
 })
 
-app.get('/state', async (req: Request, res: Response) => {
+app.get('/state/:Did', async (req: Request<{ DId: Number }>, res: Response) => {
 	let microserviceIP = await getMicroservice("state")
 	console.log("get microserviceIP: " + microserviceIP)
-	await fetch(microserviceIP + "/ping").then(response => response.json()).then(data => {
+	await fetch(microserviceIP + "/get/" + req.params.DId).then(response => response.json()).then(data => {
 		res.status(200).json({
 			"Time": new Date().toUTCString(),
-			"response": data
+			"response": data.data
 		});
 	}).catch(error => {
 		res.status(502).json({
@@ -40,10 +41,6 @@ app.get('/state', async (req: Request, res: Response) => {
 			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
 		});
 	})
-	res.status(502).json({
-		"Time": new Date().toUTCString(),
-		"response": "https://tenor.com/view/shits-fucked-gif-25512725"
-	});
 })
 
 app.listen(PORT, () => {
