@@ -1,6 +1,7 @@
 // Importing module
 import express, { Application, Request, Response } from 'express';
 import 'dotenv/config'
+import { stringify } from 'querystring';
 
 const bp = require('body-parser');
 const app: Application = express();
@@ -27,7 +28,7 @@ app.get('/a', (req: Request, res: Response) => {
 	});
 })
 
-app.get('/state/:Did', async (req: Request<{ DId: Number }>, res: Response) => {
+app.get('/state/:DId', async (req: Request<{ DId: String }>, res: Response) => {
 	let microserviceIP = await getMicroservice("state")
 	console.log("get microserviceIP: " + microserviceIP)
 	await fetch(microserviceIP + "/get/" + req.params.DId).then(response => response.json()).then(data => {
@@ -61,13 +62,18 @@ app.post('/state', async (req: Request, res: Response) => {
 	})
 })
 
-app.put('/state/:Did', async (req: Request<{ DId: Number }>, res: Response) => {
+app.put('/state/:DId', async (req: Request<{ DId: String }>, res: Response) => {
 	let microserviceIP = await getMicroservice("state")
 	console.log("get microserviceIP: " + microserviceIP)
-	await fetch(microserviceIP + "/put/" + req.params.DId).then(response => response.json()).then(data => {
+	await fetch(
+		microserviceIP + "/put/" + req.params.DId, {
+			method: "PUT",  headers: { "Content-Type": "application/json" }, 
+			body: JSON.stringify(req.body)
+		}
+	).then(response => response.json()).then(data => {
 		res.status(200).json({
 			"Time": new Date().toUTCString(),
-			"response": data.data
+			"response": data.Status
 		});
 	}).catch(error => {
 		console.log(error);
