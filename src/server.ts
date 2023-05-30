@@ -36,6 +36,41 @@ app.get('/state/:Did', async (req: Request<{ DId: Number }>, res: Response) => {
 			"response": data.data
 		});
 	}).catch(error => {
+		console.log(error);
+		res.status(502).json({
+			"Time": new Date().toUTCString(),
+			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
+		});
+	})
+})
+
+app.post('/state', async (req: Request, res: Response) => {
+	let microserviceIP = await getMicroservice("state")
+	console.log("get microserviceIP: " + microserviceIP)
+	await fetch(microserviceIP + "/post", {method: "POST"}).then(response => response.json()).then(data => {
+		res.status(200).json({
+			"Time": new Date().toUTCString(),
+			"response": data.DId
+		});
+	}).catch(error => {
+		console.log(error);
+		res.status(502).json({
+			"Time": new Date().toUTCString(),
+			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
+		});
+	})
+})
+
+app.put('/state/:Did', async (req: Request<{ DId: Number }>, res: Response) => {
+	let microserviceIP = await getMicroservice("state")
+	console.log("get microserviceIP: " + microserviceIP)
+	await fetch(microserviceIP + "/put/" + req.params.DId).then(response => response.json()).then(data => {
+		res.status(200).json({
+			"Time": new Date().toUTCString(),
+			"response": data.data
+		});
+	}).catch(error => {
+		console.log(error);
 		res.status(502).json({
 			"Time": new Date().toUTCString(),
 			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
