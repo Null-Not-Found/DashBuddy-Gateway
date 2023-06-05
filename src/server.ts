@@ -1,5 +1,7 @@
 // Importing module
 import express, { Application, Request, Response } from 'express';
+import 'dotenv/config'
+import { stringify } from 'querystring';
 
 const bp = require('body-parser');
 const app: Application = express();
@@ -26,24 +28,60 @@ app.get('/a', (req: Request, res: Response) => {
 	});
 })
 
-app.get('/state', async (req: Request, res: Response) => {
+app.get('/state/:DId', async (req: Request<{ DId: String }>, res: Response) => {
 	let microserviceIP = await getMicroservice("state")
 	console.log("get microserviceIP: " + microserviceIP)
-	await fetch(microserviceIP + "/ping").then(response => response.json()).then(data => {
+	await fetch(microserviceIP + "/get/" + req.params.DId).then(response => response.json()).then(data => {
 		res.status(200).json({
 			"Time": new Date().toUTCString(),
-			"response": data
+			"response": data.data
 		});
 	}).catch(error => {
+		console.log(error);
 		res.status(502).json({
 			"Time": new Date().toUTCString(),
 			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
 		});
 	})
-	res.status(502).json({
-		"Time": new Date().toUTCString(),
-		"response": "https://tenor.com/view/shits-fucked-gif-25512725"
-	});
+})
+
+app.post('/state', async (req: Request, res: Response) => {
+	let microserviceIP = await getMicroservice("state")
+	console.log("get microserviceIP: " + microserviceIP)
+	await fetch(microserviceIP + "/post", {method: "POST"}).then(response => response.json()).then(data => {
+		res.status(200).json({
+			"Time": new Date().toUTCString(),
+			"response": data.DId
+		});
+	}).catch(error => {
+		console.log(error);
+		res.status(502).json({
+			"Time": new Date().toUTCString(),
+			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
+		});
+	})
+})
+
+app.put('/state/:DId', async (req: Request<{ DId: String }>, res: Response) => {
+	let microserviceIP = await getMicroservice("state")
+	console.log("get microserviceIP: " + microserviceIP)
+	await fetch(
+		microserviceIP + "/put/" + req.params.DId, {
+			method: "PUT",  headers: { "Content-Type": "application/json" }, 
+			body: JSON.stringify(req.body)
+		}
+	).then(response => response.json()).then(data => {
+		res.status(200).json({
+			"Time": new Date().toUTCString(),
+			"response": data.Status
+		});
+	}).catch(error => {
+		console.log(error);
+		res.status(502).json({
+			"Time": new Date().toUTCString(),
+			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
+		});
+	})
 })
 
 app.listen(PORT, () => {
