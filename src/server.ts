@@ -28,6 +28,7 @@ app.get('/a', (req: Request, res: Response) => {
 	});
 })
 
+//State 
 app.get('/state/:DId', async (req: Request<{ DId: String }>, res: Response) => {
 	let microserviceIP = await getMicroservice("state")
 	console.log("get microserviceIP: " + microserviceIP)
@@ -74,6 +75,25 @@ app.put('/state/:DId', async (req: Request<{ DId: String }>, res: Response) => {
 		res.status(200).json({
 			"Time": new Date().toUTCString(),
 			"response": data.Status
+		});
+	}).catch(error => {
+		console.log(error);
+		res.status(502).json({
+			"Time": new Date().toUTCString(),
+			"response": "https://tenor.com/view/shits-fucked-gif-25512725"
+		});
+	})
+})
+
+//GraphQL
+
+app.post('/GrapQL', async (req: Request, res: Response) => {
+	let microserviceIP = await getMicroservice("data")
+	console.log("get microserviceIP: " + microserviceIP)
+	await fetch(microserviceIP + "/GraphQl", {headers: {'Content-Type': 'application/json'}, method: "POST", body: req.body}).then(response => response.json()).then(data => {
+		res.status(200).json({
+			"Time": new Date().toUTCString(),
+			"response": JSON.stringify(data)
 		});
 	}).catch(error => {
 		console.log(error);
